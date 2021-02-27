@@ -128,8 +128,41 @@
 
       let urlToFetch = "https://data.cityofchicago.org/resource/aksk-kvfp.json";
 
-      document.querySelector('a[data-screen=data]').addEventListener("click", (event) => {
 
+      // handle form updates from button click
+      document.querySelector('#form-button').addEventListener("click", (event) => {
+          let status = document.querySelector('div#form select').value;
+          let zip = document.querySelector('#zipCodeField').value;
+          let zone = document.querySelector('#zoningField').value;
+
+          let defaultUrl = "https://data.cityofchicago.org/resource/aksk-kvfp.json";
+
+          // if not empty, add it to url
+          if ((status === "") == false) {
+            
+            defaultUrl = defaultUrl + "?property_status=" + status;
+          }
+
+          if ((zip === "") == false) {
+            
+            defaultUrl = defaultUrl + "?zip_code=" + zip;
+          }
+          
+          if ((zone === "") == false) {
+            
+            defaultUrl = defaultUrl + "?zoning_classification=" + zone;
+          }
+
+          console.log(defaultUrl);
+          urlToFetch = defaultUrl;
+
+          //console.log(status + ", " + zip + ", " + zone);
+          //console.log(status === "");
+      })
+
+        // update data tab each time it is loaded
+      document.querySelector('a[data-screen=data]').addEventListener("click", (event) => {
+        console.log("fetching: " + urlToFetch);
         fetch(urlToFetch)
             .then( (response) => {
                 return response.json()})
@@ -139,8 +172,17 @@
                     let cardNode = document.querySelector('div#data .row')
                     let tmp = cardNode.cloneNode(true)
                     
-                    tmp.querySelector('h5').innerHTML = entry.community_area_name;
-                    tmp.querySelector('h6').innerHTML = entry.sq_ft + "sq ft"; 
+                    if (entry.community_area_name !== undefined) {
+                        tmp.querySelector('h5').innerHTML = entry.community_area_name;
+                    } else {
+                        tmp.querySelector('h5').innerHTML = "UNSPECIFIED AREA";
+                    }
+
+                    if (entry.sq_ft !== undefined) {
+                        tmp.querySelector('h6').innerHTML = entry.sq_ft + "sq ft"; 
+                    } else {
+                        tmp.querySelector('h6').innerHTML = "Total sq ft unspecified"
+                    }
 
                     // paragraph element consists of multiple lines and formatting them
                     tmp.querySelector('p#p1').innerHTML = "Address: " + entry.address;
@@ -152,7 +194,9 @@
                 }
                 document.body.querySelector('div#data .row').remove()
             })
-    })
+        })
+
+    
 
       menuOptions.forEach( (anchor) => {
 
