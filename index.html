@@ -47,8 +47,10 @@
 
       </nav>
 
+
+      <!-- Home page -->
       <div class="container-fluid screen" id="home">
-        <h1 class="mt-4">Home</h1>
+        <h1 class="mt-4">Chicago Land Inventory</h1>
         <p>This application lets users search Chicago's city-owned land inventory. It contains multiple options that are made visible with the 'View Menu' button above. </p>
         <p>An overview of page options:</p>
         <p> https://dev.socrata.com/foundry/data.cityofchicago.org/aksk-kvfp dataset </p>
@@ -61,11 +63,45 @@
         </ul>
       </div>
 
+      <!-- Form page -->
       <div class="container-fluid screen" id="form">
         <h1 class="mt-4">Form</h1>
-        <p>Choose some criteria to search for</p>
-        <button class="btn btn-primary" id="form-button">Search</button>
+        <p>Choose some criteria to filter the results (if none are selected all data is shown)</p>
+        <h5 class="mt-4"> Property status </h5>
+        <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+            <option selected value="">Choose a property status</option>
+            <option value="">Any</option>
+            <option value="Owned by City">City owned</option>
+            <option value="Not City Owned"> Not city owned</option>
+            <option value="Sold">Sold</option>
+          </select>
+        <br/> 
+        <h5 class="mt-4"> Zip Code </h5>
+        <input id = "zipCodeField" type="text" class="form-control smallform" placeholder="Zip" aria-label="Zip">
+        <h5 class="mt-4"> Zoning Classification </h5>
+        <input id = "zoningField" type="text" class="form-control smallform" placeholder="Zone" aria-label="Zone">
+        <br/>
+        <button class="btn btn-primary" id="form-button">Filter</button>
 
+
+      </div>
+
+      <!-- Data page -->
+      <div class="container-fluid screen" id="data">
+        <h1 class="mt-4">Data</h1>
+        <p>City of Chicago Land Inventory</p>
+        <div class="row">
+            <div class="card border-dark w-50" >
+              <div class="card-body">
+                <h5 class="card-title">Card title</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <p class="card-text" id="p1">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <p class="card-text" id = "p2"> blah</p>
+            </div>
+            </div>
+      
+      
+          </div>
       </div>
     </div>
     <!-- /#page-content-wrapper -->
@@ -89,6 +125,34 @@
 
       document.querySelector("#home").style.display = "block";
       let menuOptions = document.querySelectorAll('div#sbar a');
+
+      let urlToFetch = "https://data.cityofchicago.org/resource/aksk-kvfp.json";
+
+      document.querySelector('a[data-screen=data]').addEventListener("click", (event) => {
+
+        fetch(urlToFetch)
+            .then( (response) => {
+                return response.json()})
+            .then ( (json) => {
+                for (let entry of json) {
+                    console.log(entry.sq_ft);
+                    let cardNode = document.querySelector('div#data .row')
+                    let tmp = cardNode.cloneNode(true)
+                    
+                    tmp.querySelector('h5').innerHTML = entry.community_area_name;
+                    tmp.querySelector('h6').innerHTML = entry.sq_ft + "sq ft"; 
+
+                    // paragraph element consists of multiple lines and formatting them
+                    tmp.querySelector('p#p1').innerHTML = "Address: " + entry.address;
+                    tmp.querySelector('p#p2').innerHTML = "Pin: " + entry.pin;
+
+
+                    // add card to document body (parentNode)
+                    cardNode.parentNode.append(tmp)
+                }
+                document.body.querySelector('div#data .row').remove()
+            })
+    })
 
       menuOptions.forEach( (anchor) => {
 
