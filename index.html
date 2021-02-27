@@ -90,6 +90,8 @@
       <div class="container-fluid screen" id="data">
         <h1 class="mt-4">Data</h1>
         <p>City of Chicago Land Inventory</p>
+        <h6 class="mt-4" id="results"></h6>
+        <div id="all">
         <div class="row">
             <div class="card border-dark w-50" >
               <div class="card-body">
@@ -102,6 +104,7 @@
       
       
           </div>
+        </div>
       </div>
     </div>
     <!-- /#page-content-wrapper -->
@@ -135,30 +138,44 @@
           let zip = document.querySelector('#zipCodeField').value;
           let zone = document.querySelector('#zoningField').value;
 
-          let defaultUrl = "https://data.cityofchicago.org/resource/aksk-kvfp.json";
+          let endpoint = "https://data.cityofchicago.org/resource/aksk-kvfp.json";
 
-          // if not empty, add it to url
+          //if not empty, add it to url
+          let myCount = 0; // count of how many parameters added on, if over 1 then use & to join queries 
           if ((status === "") == false) {
             
-            defaultUrl = defaultUrl + "?property_status=" + status;
+            endpoint = endpoint + "?property_status=" + status;
+            myCount++;
           }
 
           if ((zip === "") == false) {
             
-            defaultUrl = defaultUrl + "?zip_code=" + zip;
+            if (myCount > 0) {
+                endpoint = endpoint + "&zip_code=" + zip;
+            } else {
+                endpoint = endpoint + "?zip_code=" + zip;
+            }
+            myCount++;
+
           }
           
           if ((zone === "") == false) {
             
-            defaultUrl = defaultUrl + "?zoning_classification=" + zone;
+            if(myCount > 0) {
+                endpoint = endpoint + "&zoning_classification=" + zone;
+            } else {
+                endpoint = endpoint + "?zoning_classification=" + zone;
+            }
           }
 
-          console.log(defaultUrl);
-          urlToFetch = defaultUrl;
+         // wish that I started with an HTML form, would have made things a lot easier
+        
+          console.log(endpoint);
+          urlToFetch = endpoint;
 
-          //console.log(status + ", " + zip + ", " + zone);
-          //console.log(status === "");
       })
+
+
 
         // update data tab each time it is loaded
       document.querySelector('a[data-screen=data]').addEventListener("click", (event) => {
@@ -167,8 +184,17 @@
             .then( (response) => {
                 return response.json()})
             .then ( (json) => {
+                document.querySelector("#results").innerHTML = "Results returned: " + json.length;
+
+                // clear any existing data 
+                let element = document.querySelector("div#data #all");
+                while(element.childNodes.length > 2) {
+                    element.removeChild(element.lastChild);
+                }
+
+                
                 for (let entry of json) {
-                    console.log(entry.sq_ft);
+                    //console.log(entry.sq_ft);
                     let cardNode = document.querySelector('div#data .row')
                     let tmp = cardNode.cloneNode(true)
                     
