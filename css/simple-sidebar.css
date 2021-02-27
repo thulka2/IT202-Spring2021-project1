@@ -56,3 +56,7 @@
 .smallform {
   width: 80px;
 }
+
+#map {
+  height: 100%;
+}

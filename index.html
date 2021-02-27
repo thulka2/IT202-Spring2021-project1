@@ -106,6 +106,8 @@
           </div>
         </div>
       </div>
+      <!-- Map page -->
+      <div id="map"></div>
     </div>
     <!-- /#page-content-wrapper -->
 
@@ -125,10 +127,20 @@
   </script>
 
   <script>
+      let map;
+
+      function initMap() {
+      map = new google.maps.Map(document.getElementById("map"), {
+            center: {lat: 41.869, lng: -87.649},
+            zoom: 12,
+      });
+      }
+
 
       document.querySelector("#home").style.display = "block";
       let menuOptions = document.querySelectorAll('div#sbar a');
 
+      // keeps track of filtered data url, by default it is the clean endpoint
       let urlToFetch = "https://data.cityofchicago.org/resource/aksk-kvfp.json";
 
 
@@ -222,8 +234,44 @@
             })
         })
 
-    
 
+        // update map tab each time it is loaded to reflect what is on data page
+        document.querySelector('a[data-screen=map]').addEventListener("click", (event) => {
+            console.log("fetching: " + urlToFetch);
+            fetch(urlToFetch)
+            .then( (response) => {
+                return response.json()})
+            .then ( (json) => {
+               
+                
+                for (let entry of json) {
+                    console.log(entry.sq_ft);
+                    // let cardNode = document.querySelector('div#data .row')
+                    // let tmp = cardNode.cloneNode(true)
+                    
+                    // if (entry.community_area_name !== undefined) {
+                    //     tmp.querySelector('h5').innerHTML = entry.community_area_name;
+                    // } else {
+                    //     tmp.querySelector('h5').innerHTML = "UNSPECIFIED AREA";
+                    // }
+
+                    // if (entry.sq_ft !== undefined) {
+                    //     tmp.querySelector('h6').innerHTML = entry.sq_ft + "sq ft"; 
+                    // } else {
+                    //     tmp.querySelector('h6').innerHTML = "Total sq ft unspecified"
+                    // }
+
+                    // // paragraph element consists of multiple lines and formatting them
+                    // tmp.querySelector('p#p1').innerHTML = "Address: " + entry.address;
+                    // tmp.querySelector('p#p2').innerHTML = "Pin: " + entry.pin;
+
+
+                  
+                }
+            })
+        })
+
+        // handle clicks on each tab on the lefthand side
       menuOptions.forEach( (anchor) => {
 
        
@@ -245,6 +293,11 @@
       })
   </script>
 
+   <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+   <script
+   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVIWSXUb-hanWRhU3VHaMOTardJLCqoiI&callback=initMap&libraries=&v=weekly"
+   async
+    ></script>
 </body>
 
 </html>
