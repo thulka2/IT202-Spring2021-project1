@@ -53,7 +53,6 @@
         <h1 class="mt-4">Chicago Land Inventory</h1>
         <p>This application lets users search Chicago's city-owned land inventory. It contains multiple options that are made visible with the 'View Menu' button above. </p>
         <p>An overview of page options:</p>
-        <p> https://dev.socrata.com/foundry/data.cityofchicago.org/aksk-kvfp dataset </p>
         <ul class="list-group list-group-flus">
             <li class="list-group-item"> Form - A form that allows users to filter the data.  </li>
             <li class="list-group-item"> Data - A list view of the land inventory data.  </li>
@@ -109,6 +108,15 @@
       <!-- Map page -->
      
       <div id="map" class="screen"></div>
+
+
+       <!-- About page -->
+       <div class="container-fluid screen" id="about">
+        <h1 class="mt-4">About</h1>
+        <p>This <a target="_blank" href="https://dev.socrata.com/foundry/data.cityofchicago.org/aksk-kvfp">database</a> by Socrata powers this application. Bootstrap and the Google Maps API are also used. Built entirely with HTML, CSS, and JavaScript. </p>
+        <p>Made by Tomasz Hulka for UIC's IT202, Spring 2021</p>
+       
+      </div>
     
      
     </div>
@@ -256,13 +264,41 @@
                    
                     const location = { lat: parseFloat(entry.latitude), lng: parseFloat(entry.longitude)};
                     
+                    let area; 
+                    let sq_ft;
+
+                     
+                    if (entry.community_area_name !== undefined) {
+                        area = entry.community_area_name;
+                    } else {
+                        area = "UNSPECIFIED AREA";
+                    }
+
+                    if (entry.sq_ft !== undefined) {
+                        sq_ft = entry.sq_ft + "sq ft"; 
+                    } else {
+                        sq_ft = "Total sq ft unspecified"
+                    }
+                    
 
                     const contentString = 
-                        '<div id="content">' +
-                        '<h5 class="mt-4">' + 
-                        entry.community_area_name +
+                        '<div id="card-body">' +
+                        '<h5 class="card-title">' + 
+                        area +
                         '</h5>' +
-                        '</div>'
+                        '</div>' +
+                        '<h6 class="card-subtitle mb-2 text-muted">' +
+                        sq_ft + 
+                        '</h6>' +
+                        '<p class="card-text">' +
+                        "Address: " +
+                        entry.address +
+                        '</p>' +
+                        '<p class="card-text">' +
+                        "Pin: " +
+                        entry.pin +
+                        '</p>'
+
 
                     const infowindow = new google.maps.InfoWindow({
                          content: contentString,
@@ -278,35 +314,13 @@
                         infowindow.open(map, marker);
                     });
 
-
-
-                    // let cardNode = document.querySelector('div#data .row')
-                    // let tmp = cardNode.cloneNode(true)
-                    
-                    // if (entry.community_area_name !== undefined) {
-                    //     tmp.querySelector('h5').innerHTML = entry.community_area_name;
-                    // } else {
-                    //     tmp.querySelector('h5').innerHTML = "UNSPECIFIED AREA";
-                    // }
-
-                    // if (entry.sq_ft !== undefined) {
-                    //     tmp.querySelector('h6').innerHTML = entry.sq_ft + "sq ft"; 
-                    // } else {
-                    //     tmp.querySelector('h6').innerHTML = "Total sq ft unspecified"
-                    // }
-
-                    // // paragraph element consists of multiple lines and formatting them
-                    // tmp.querySelector('p#p1').innerHTML = "Address: " + entry.address;
-                    // tmp.querySelector('p#p2').innerHTML = "Pin: " + entry.pin;
-
-
                   
                 }
             })
         })
 
         // handle clicks on each tab on the lefthand side
-      menuOptions.forEach( (anchor) => {
+     menuOptions.forEach( (anchor) => {
 
        
             
